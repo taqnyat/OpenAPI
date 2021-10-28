@@ -1,0 +1,413 @@
+openapi: 3.0.3
+servers:
+  - url: https://api.taqnyat.sa
+security:
+  - BearerAuth: []
+info:
+  contact:
+    email: support@taqnyat.sa
+    name: Taqnyat API Documentation
+    url: https://www.taqnyat.sa/documentation
+    x-twitter: taqnyatsa
+  description: |-
+    With our REST, easy, and smart "SMS" APIs we allow you to integrate SMS at your app and get started in seconds, With Taqnyat, building a solution with SMS capabilities never been easier, a few lines of code will enable the SMS to create a magnificent app fit with your business needs.
+    [For more information](https://www.taqnyat.sa/documentation/).
+  license:
+    name: MIT for OAS 2.0
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://www.taqnyat.sa/en/terms/
+  title: Taqnyat API
+  version: 1.0.6
+  x-apisguru-categories:
+    - telecom
+  x-logo:
+    url: https://www.taqnyat.sa/assets/images/logo.gif
+  x-origin:
+    - format: openapi
+      url: taqnyat json
+      version: "3.0"
+  x-providerName: taqnyat.sa
+tags:
+  - description: System operations
+    name: System
+  - description: Account operations
+    name: Account
+  - description: Messages operations
+    name: Messages
+paths:
+  /system/status:
+    get:
+      summary: Status
+      operationId: getSystemStatusUsingGET
+      description: Get Taqnyat System Status
+      tags:
+        - System
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessStatusResponseObj"
+  /account/balance:
+    get:
+      summary: Balance
+      operationId: getBalanceUsingGET
+      description: Get your account Balance
+      tags:
+        - Account
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessBalanceResponseObj"
+        "401":
+          description: "You are using wrong bearer Tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorBalanceResponseObj"
+        "405":
+          description: "You are using Restfull API with wrong method"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorBalanceResponseObj"
+  /v1/messages:
+    post:
+      summary: Send SMS
+      operationId: sendSmsUsingPOST
+      description: Message
+      tags:
+        - Messages
+      requestBody:
+        description: Sample Request Object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsMessage"
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessSMSResponseObj"
+        "401":
+          description: "You are using wrong bearer Tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorSMSResponseObj"
+        "405":
+          description: "You are using Restfull API with wrong method"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorSMSResponseObj"
+  /v1/messages/delete:
+    delete:
+      summary: Delete SMS
+      operationId: deleteSmsUsingDELETE
+      description: Delete Message
+      tags:
+        - Messages
+      requestBody:
+        description: Sample Request Object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteSmsMessage"
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessDeleteSMSResponseObj"
+        "401":
+          description: "You are using wrong bearer Tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+        "405":
+          description: "You are using Restfull API with wrong method"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+        "422":
+          description: "You are using Invalid deleteId"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+  /v1/messages/senders:
+    get:
+      summary: Senders
+      operationId: getSenderNamesUsingGET
+      description: Get your sender names
+      tags:
+        - Messages
+
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessSendersResponseObj"
+        "401":
+          description: "You are using wrong bearer Tokens"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorSendersResponseObj"
+        "405":
+          description: "You are using Restfull API with wrong method"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorSendersResponseObj"
+      
+components:
+  schemas:
+    errorBalanceResponseObj:
+      type: object
+      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 401
+        message:
+          description: Short, human-readable summary of the problem type
+          type: string
+          example: invalid credentials information.
+    errorSendersResponseObj:
+            type: object
+            description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+            required:
+              - statusCode
+              - message
+            properties:
+              statusCode:
+                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+                type: integer
+                example: 401
+              message:
+                description: Short, human-readable summary of the problem type
+                type: string
+                example: invalid credentials information.
+    errorDeleteSMSResponseObj:
+      type: object
+      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 401
+        message:
+          description: Short, human-readable summary of the problem type
+          type: string
+          example: invalid credentials information.
+    errorSMSResponseObj:
+      type: object
+      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 401
+        message:
+          description: Short, human-readable summary of the problem type
+          type: string
+          example: invalid credentials information.
+
+    SuccessSendersResponseObj:
+            type: object
+            description: Success Reponse for Delete Message Request.
+            required:
+              - statusCode
+              - message
+      
+            properties:
+              statusCode:
+                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+                type: integer
+                example: 201
+              senders:
+                description: Array of your Sender Names
+                type: array
+                example: [{"senderName":"sender name 1","status":"active","destination":"KSA"},{"senderName":"sender name 2","status":"active","destination":"international"}]
+    SuccessDeleteSMSResponseObj:
+      type: object
+      description: Success Reponse for Delete Message Request.
+      required:
+        - statusCode
+        - message
+
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 201
+        message:
+          description: Your Short, human-readable summary of result
+          type: string
+          example: "Deleted successfully"
+
+    SuccessSMSResponseObj:
+      type: object
+      description: Success Reponse for Message Request.
+      required:
+        - statusCode
+        - messageId
+        - cost
+        - currency
+        - totalCount
+        - msgLength
+        - accepted
+        - rejected
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 201
+        messageId:
+          description: Your message ID
+          type: string
+          example: "5829452722"
+        cost:
+          description: Your message Cost in Saudi Riyal
+          type: string
+          example: "0.1500"
+        currency:
+          description: Your message cost currency.
+          type: string
+          example: "SAR"
+        totalCount:
+          description: Total count of accepted recipients
+          type: integer
+          example: 1
+        msgLength:
+          description: Your message length .
+          type: integer
+          example: 1
+        accepted:
+          description: Accepted Numbers
+          type: string
+          example: "[966500000000,]"
+        rejected:
+          description: Rejected Numbers
+          type: string
+          example: "[]"
+    
+    SuccessStatusResponseObj:
+            type: object
+            description: Success Reponse for Balance Request.
+            required:
+              - statusCode
+              - status
+            properties:
+              statusCode:
+                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+                type: integer
+                example: 200
+              status:
+                  description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+                  type: object
+                  example: { service: "none", description: "All Services are Operational" }
+    SuccessBalanceResponseObj:
+      type: object
+      description: Success Reponse for Balance Request.
+      required:
+        - statusCode
+        - accountStatus
+        - accountExpiryDate
+        - balance
+        - currency
+        - points
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 200
+        accountStatus:
+          description: Your account status .
+          example: active
+          type: string
+        accountExpiryDate:
+          description: Your account credit expiry date .
+          type: string
+          example: 15-03-2021
+        balance:
+          description: Your account balance in Saudi Riyal .
+          type: string
+          example: "100.0000"
+        currency:
+          description: Your account balance Currency .
+          type: string
+          example: "SAR"
+        points:
+          description: Your account points .
+          type: string
+          example: "667"
+    DeleteSmsMessage:
+      type: object
+      required:
+        - deleteId
+      properties:
+        deleteId:
+          description: Message ID
+          type: integer
+          example: 3242424
+    SmsMessage:
+      type: object
+      required:
+        - recipients
+        - body
+        - sender
+      properties:
+        recipients:
+          description: Array of international format without 00 or symbol (+)
+          type: array
+          example: [966500000000, 966511111111]
+        body:
+          description: The Content of the message
+          type: string
+          example: "Hello From Taqnyat !"
+        sender:
+          description: Predefined sender name at your account
+          type: string
+          example: Taqnyat.sa
+        scheduledDatetime:
+          description: "Schedule the message to send later IE: 2020-09-30T14:26"
+          type: string
+          example: 2020-09-30T14:26
+        deleteId:
+          description: "Random id to be used to delete message on Delete Endpoint "
+          type: integer
+          example: 3242424
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        The token is sent in the `Authorization` header preceded by `Bearer`. It's required for all requests made to the REST API.
+        You can find your token in the Dashboard , Follow this link to learn [How to setup Bearer token](https://www.taqnyat.sa/documentation/sms/#setup-bearer).
