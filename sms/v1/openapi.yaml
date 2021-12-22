@@ -42,13 +42,23 @@ paths:
       description: Get Taqnyat System Status
       tags:
         - System
+      security: [{}]
       responses:
         "200":
-          description: "Success"
+          description: "Success , SMS service work good"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessStatusResponseObj"
+        "403":
+          description: "Forbidden\n - Check with Taqnyat Support for more detailed information\n."
+        "503":
+          description: "Maintenance , SMS service down for Maintenance reason"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MaintenanceStatusResponseObj"
+
   /account/balance:
     get:
       summary: Balance
@@ -56,8 +66,6 @@ paths:
       description: Get your account Balance
       tags:
         - Account
-      security:
-        - BearerAuth: []
       responses:
         "201":
           description: "Success"
@@ -70,13 +78,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBalanceResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-401"
+        "403":
+          description: "Forbidden\n - Check with Taqnyat Support for more detailed information\n."
         "405":
           description: "You are using Restfull API with wrong method"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorBalanceResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-405"
   /v1/messages:
     post:
       summary: Send SMS
@@ -97,18 +107,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessSMSResponseObj"
+        "400":
+          description: "Sender Name not active"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorSMSResponseObj-400"
         "401":
           description: "You are using wrong bearer Tokens"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorSMSResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-401"
+        "403":
+          description: "Forbidden\n - Check with Taqnyat Support for more detailed information\n."
         "405":
           description: "You are using Restfull API with wrong method"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorSMSResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-405"
   /v1/messages/delete:
     delete:
       summary: Delete SMS
@@ -134,19 +152,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-401"
+        "403":
+          description: "Forbidden\n - Check with Taqnyat Support for more detailed information\n."
+
         "405":
           description: "You are using Restfull API with wrong method"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-405"
         "422":
           description: "You are using Invalid deleteId"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorDeleteSMSResponseObj"
+                $ref: "#/components/schemas/errorDeleteSMSResponseObj-422"
   /v1/messages/senders:
     get:
       summary: Senders
@@ -154,7 +175,6 @@ paths:
       description: Get your sender names
       tags:
         - Messages
-
       responses:
         "201":
           description: "Success"
@@ -167,17 +187,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorSendersResponseObj"
+                $ref: "#/components/schemas/errorSMSResponseObj-401"
+        "403":
+          description: "Forbidden\n - Check with Taqnyat Support for more detailed information\n."
         "405":
           description: "You are using Restfull API with wrong method"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/errorSendersResponseObj"
-      
+                $ref: "#/components/schemas/errorSMSResponseObj-405"
+
 components:
   schemas:
-    errorBalanceResponseObj:
+    errorDeleteSMSResponseObj-422:
+      type: object
+      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 422
+        message:
+          description: Short, human-readable summary of the problem type
+          type: string
+          example: Sender Name not active .
+    errorSMSResponseObj-400:
+      type: object
+      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
+      required:
+        - statusCode
+        - message
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 400
+        message:
+          description: Short, human-readable summary of the problem type
+          type: string
+          example: Sender Name not active .
+    errorSMSResponseObj-401:
       type: object
       description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
       required:
@@ -192,22 +244,7 @@ components:
           description: Short, human-readable summary of the problem type
           type: string
           example: invalid credentials information.
-    errorSendersResponseObj:
-            type: object
-            description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
-            required:
-              - statusCode
-              - message
-            properties:
-              statusCode:
-                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
-                type: integer
-                example: 401
-              message:
-                description: Short, human-readable summary of the problem type
-                type: string
-                example: invalid credentials information.
-    errorDeleteSMSResponseObj:
+    errorSMSResponseObj-405:
       type: object
       description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
       required:
@@ -217,43 +254,40 @@ components:
         statusCode:
           description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
           type: integer
-          example: 401
+          example: 405
         message:
           description: Short, human-readable summary of the problem type
           type: string
-          example: invalid credentials information.
-    errorSMSResponseObj:
-      type: object
-      description: The problem object follows [RFC-7807](https://tools.ietf.org/html/rfc7807).
-      required:
-        - statusCode
-        - message
-      properties:
-        statusCode:
-          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
-          type: integer
-          example: 401
-        message:
-          description: Short, human-readable summary of the problem type
-          type: string
-          example: invalid credentials information.
+          example: Method Not Allowed.
 
     SuccessSendersResponseObj:
-            type: object
-            description: Success Reponse for Delete Message Request.
-            required:
-              - statusCode
-              - message
-      
-            properties:
-              statusCode:
-                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
-                type: integer
-                example: 201
-              senders:
-                description: Array of your Sender Names
-                type: array
-                example: [{"senderName":"sender name 1","status":"active","destination":"KSA"},{"senderName":"sender name 2","status":"active","destination":"international"}]
+      type: object
+      description: Success Reponse for Delete Message Request.
+      required:
+        - statusCode
+        - senders
+
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 201
+        senders:
+          description: Array of your Sender Names
+          type: array
+          example:
+            [
+              {
+                "senderName": "sender name 1",
+                "status": "active",
+                "destination": "KSA",
+              },
+              {
+                "senderName": "sender name 2",
+                "status": "active",
+                "destination": "international",
+              },
+            ]
     SuccessDeleteSMSResponseObj:
       type: object
       description: Success Reponse for Delete Message Request.
@@ -267,7 +301,7 @@ components:
           type: integer
           example: 201
         message:
-          description: Your Short, human-readable summary of result
+          description: Short, human-readable summary of result
           type: string
           example: "Deleted successfully"
 
@@ -316,22 +350,42 @@ components:
           description: Rejected Numbers
           type: string
           example: "[]"
-    
+
     SuccessStatusResponseObj:
-            type: object
-            description: Success Reponse for Balance Request.
-            required:
-              - statusCode
-              - status
-            properties:
-              statusCode:
-                description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
-                type: integer
-                example: 200
-              status:
-                  description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
-                  type: object
-                  example: { service: "none", description: "All Services are Operational" }
+      type: object
+      description: Success Reponse for Status Request.
+      required:
+        - statusCode
+        - status
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 200
+        status:
+          description:  Short, human-readable summary of result
+          type: object
+          example:
+            { service: "none", description: "All Services are Operational" }
+    MaintenanceStatusResponseObj:
+      type: object
+      description: Maintenance Reponse for Status Request.
+      required:
+        - statusCode
+        - status
+      properties:
+        statusCode:
+          description: The HTTP status code (RFC7231, Section 6) generated by the origin server for this occurrence of the problem
+          type: integer
+          example: 200
+        status:
+          description: Short, human-readable summary of result
+          type: object
+          example:
+            {
+              service: "Rest API (HTTPS) ",
+              description: " Down for Maintenance",
+            }
     SuccessBalanceResponseObj:
       type: object
       description: Success Reponse for Balance Request.
